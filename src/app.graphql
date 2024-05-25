@@ -5,7 +5,7 @@ schema {
 type Query {
   sayHello: String
   getGenes(input: GeneInput!): [Gene!]!
-  getGeneInteractions(input: InteractionInput!): GeneInteractionOutput!
+  getGeneInteractions(input: InteractionInput!): [GeneInteractionOutput!]
 }
 
 input GeneInput {
@@ -18,110 +18,103 @@ input InteractionInput {
 }
 
 type GeneInteractionOutput {
-  interactions: [GeneInteraction!]!
-  genes: [Gene!]!
+  gene: Gene!
+  neighbour: [RecursiveGeneInteraction!]
+}
+
+type RecursiveGeneInteraction {
+  gene: Gene!
+  score: Float!
+  neighbour: [RecursiveGeneInteraction!]
 }
 
 type Gene {
   hgnc_gene_symbol: String
-  GWAS_OR_ot_genetics_MONDO_0004976_PMID32968195_odds_ratio: Float
-  GDA_Score_opentargets_impc: Float
-  Druggability_Score_drugnome_tier_1_and_2_and_3a: Float
-  pathway_Ubiquitination_And_Proteasome_Degradation_R_HSA_83168: Float
-  pathway_AMPK_signaling_pathway: Float
-  GDA_Score_opentargets_literature: Float
-  GDA_Score_opentargets_ot_genetics_portal: Float
-  GDA_Score_opentargets_expression_atlas: Float
-  pathway_Unfolded_Protein_Response_UPR_R_HSA_381119: Float
-  pathway_Lysosome_Vesicle_Biogenesis: Float
-  GDA_Score_opentargets_orphanet: Float
+  GWAS_OR_ot_genetics_MONDO_0004976_PMID32968195_odds_ratio: String
+  GDA_Score_opentargets_impc: String
+  Druggability_Score_drugnome_tier_1_and_2_and_3a: String
+  pathway_Ubiquitination_And_Proteasome_Degradation_R_HSA_83168: String
+  pathway_AMPK_signaling_pathway: String
+  GDA_Score_opentargets_literature: String
+  GDA_Score_opentargets_ot_genetics_portal: String
+  GDA_Score_opentargets_expression_atlas: String
+  pathway_Unfolded_Protein_Response_UPR_R_HSA_381119: String
+  pathway_Lysosome_Vesicle_Biogenesis: String
+  GDA_Score_opentargets_orphanet: String
   Gene_name: String
-  pathway_Protein_Ubiquitination_R_HSA_8852135: Float
-  pathway_Regulation_Of_FZD_By_Ubiquitination_R_HSA_4641263: Float
-  GWAS_OR_ot_genetics_MONDO_0004976_PMID20801718_odds_ratio: Float
-  database_Mendelian_GenCC_ALS: Float
-  pathway_Synthesis_Of_Active_Ubiquitin_Roles_Of_E1_And_E2_Enzymes_R_HSA_8866652: Float
+  pathway_Protein_Ubiquitination_R_HSA_8852135: String
+  pathway_Regulation_Of_FZD_By_Ubiquitination_R_HSA_4641263: String
+  GWAS_OR_ot_genetics_MONDO_0004976_PMID20801718_odds_ratio: String
+  database_Mendelian_GenCC_ALS: String
+  pathway_Synthesis_Of_Active_Ubiquitin_Roles_Of_E1_And_E2_Enzymes_R_HSA_8866652: String
   ID: ID!
-  Druggability_Score_drugnome_tclin_and_tier_1: Float
-  pathway_Mitophagy___animal___Homo_sapiens_human: Float
-  GWAS_OR_ot_genetics_MONDO_0004976_PMID24931836_odds_ratio: Float
-  logFC_rnaseq_PMID37080969_sod1_fold_change: Float
-  GWAS_OR_ot_genetics_MONDO_0004976_PMID24256812_odds_ratio: Float
-  pathway_IRE1alpha_Activates_Chaperones_R_HSA_381070: Float
-  pathway_Synaptic_vesicle_cycle: Float
-  pathway_p130Cas_linkage_to_MAPK_signaling_for_integrins: Float
-  pathway_Cellular_response_to_hypoxia: Float
-  GDA_Score_opentargets_genetic_association: Float
-  Druggability_Score_drugnome_antibody: Float
-  GDA_Score_opentargets_known_drug: Float
-  pathway_Vesicle_mediated_transport: Float
-  pathway_OXO_mediated_transcription_R_HSA_9614085: Float
-  GDA_Score_opentargets_genomics_england: Float
-  pathway_Chaperone_Mediated_Autophagy_R_HSA_9613829: Float
-  GDA_Score_opentargets_uniprot_variants: Float
-  Druggability_Score_drugnome_tier_1_and_2: Float
-  Druggability_Score_drugnome_protac: Float
-  pathway_Endocytosis: Float
-  logFC_rnaseq_PMID37080969_c9orf72_fold_change: Float
-  Druggability_Score_drugnome_tier_1: Float
-  GDA_Score_opentargets_animal_model: Float
+  Druggability_Score_drugnome_tclin_and_tier_1: String
+  pathway_Mitophagy___animal___Homo_sapiens_human: String
+  GWAS_OR_ot_genetics_MONDO_0004976_PMID24931836_odds_ratio: String
+  logFC_rnaseq_PMID37080969_sod1_fold_change: String
+  GWAS_OR_ot_genetics_MONDO_0004976_PMID24256812_odds_ratio: String
+  pathway_IRE1alpha_Activates_Chaperones_R_HSA_381070: String
+  pathway_Synaptic_vesicle_cycle: String
+  pathway_p130Cas_linkage_to_MAPK_signaling_for_integrins: String
+  pathway_Cellular_response_to_hypoxia: String
+  GDA_Score_opentargets_genetic_association: String
+  Druggability_Score_drugnome_antibody: String
+  GDA_Score_opentargets_known_drug: String
+  pathway_Vesicle_mediated_transport: String
+  pathway_OXO_mediated_transcription_R_HSA_9614085: String
+  GDA_Score_opentargets_genomics_england: String
+  pathway_Chaperone_Mediated_Autophagy_R_HSA_9613829: String
+  GDA_Score_opentargets_uniprot_variants: String
+  Druggability_Score_drugnome_tier_1_and_2: String
+  Druggability_Score_drugnome_protac: String
+  pathway_Endocytosis: String
+  logFC_rnaseq_PMID37080969_c9orf72_fold_change: String
+  Druggability_Score_drugnome_tier_1: String
+  GDA_Score_opentargets_animal_model: String
   Description: String
-  pathway_Ubiquitin_dependent_Degradation_Of_Cyclin_D_R_HSA_75815: Float
-  pathway_Chaperonin_mediated_Protein_Folding_R_HSA_390466: Float
-  pathway_Ribosome___Homo_sapiens_human: Float
+  pathway_Ubiquitin_dependent_Degradation_Of_Cyclin_D_R_HSA_75815: String
+  pathway_Chaperonin_mediated_Protein_Folding_R_HSA_390466: String
+  pathway_Ribosome___Homo_sapiens_human: String
   hgnc_gene_id: String
-  pathway_Ubiquitin_mediated_proteolysis: Float
-  GDA_Score_opentargets_chembl: Float
+  pathway_Ubiquitin_mediated_proteolysis: String
+  GDA_Score_opentargets_chembl: String
   old_target_id: String
-  pathway_Proteasome: Float
-  pathway_Proteasome_Degradation_R_HSA_983168: Float
-  pathway_MAPK_signaling_pathway: Float
+  pathway_Proteasome: String
+  pathway_Proteasome_Degradation_R_HSA_983168: String
+  pathway_MAPK_signaling_pathway: String
   universal_ID: String
-  Druggability_Score_drugnome_small_molecule: Float
-  pathway_Chaperone_Mediated_Autophagy: Float
-  GWAS_OR_ot_genetics_MONDO_0004976_PMID23624525_odds_ratio: Float
-  GWAS_OR_ot_genetics_MONDO_0004976_PMID29566793_odds_ratio: Float
-  Druggability_Score_drugnome_tclin_and_tchem: Float
-  logFC_rnaseq_PMID37080969_tardbp_fold_change: Float
-  GDA_Score_MantisML_HPO: Float
-  pathway_Chaperone_Mediated_Autophagy_1: Float
-  GDA_Score_opentargets_overall_association_score: Float
-  GDA_Score_opentargets_clingen: Float
-  GDA_Score_opentargets_europepmc: Float
-  pathway_Protein_processing_in_endoplasmic_reticulum___Homo_sapiens: Float
-  GWAS_Beta_ot_genetics_MONDO_0004976_PMID19451621_beta: Float
-  pathway_Ubiquitin_Mediated_Degradation_Of_Phosphorylated_Cdc25A_R_HSA_69601: Float
-  pathway_E3_Ubiquitin_Ligases_Ubiquitinate_Target_Proteins_R_HSA_8866654: Float
-  pathway_Lysosome___Homo_sapiens_human: Float
-  pathway_p38_MAPK_signaling_pathway_R_HSA_450302: Float
-  logFC_rnaseq_PMID37080969_sporadic_fold_change: Float
-  pathway_Macroautophagy: Float
-  logFC_rnaseq_PMID37080969_fus_fold_change: Float
-  GWAS_Beta_ot_genetics_MONDO_0004976_PMID34873335_beta: Float
-  GWAS_OR_ot_genetics_MONDO_0004976_PMID27455348_odds_ratio: Float
-  Druggability_Score_drugnome_tchem: Float
-  GDA_Score_opentargets_rna_expression: Float
-  pathway_SUMOylation_Of_Ubiquitinylation_Proteins_R_HSA_3232142: Float
-  Druggability_Score_drugnome_tclin: Float
-  GDA_Score_MantisML_OT: Float
-  GDA_Score_opentargets_eva: Float
-  GDA_Score_opentargets_uniprot_literature: Float
-  GWAS_OR_ot_genetics_MONDO_0004976_PMID18084291_odds_ratio: Float
-  pathway_XBP1S_Activates_Chaperone_Genes_R_HSA_381038: Float
-  pathway_Autodegradation_Of_E3_Ubiquitin_Ligase_COP1_R_HSA_349425: Float
-  pathway_Longevity_regulating_pathway___Homo_sapiens_human: Float
-  pathway_Oxidative_Stress_Induced_Senescence: Float
-}
-
-type GeneInteraction {
-  geneID: ID!
-  index: Int!
-  neighbour: [RecursiveGeneInteraction]
-}
-
-type RecursiveGeneInteraction {
-  geneID: String!
-  score: Float!
-  index: Int
-  neighbour: [RecursiveGeneInteraction!]
+  Druggability_Score_drugnome_small_molecule: String
+  pathway_Chaperone_Mediated_Autophagy: String
+  GWAS_OR_ot_genetics_MONDO_0004976_PMID23624525_odds_ratio: String
+  GWAS_OR_ot_genetics_MONDO_0004976_PMID29566793_odds_ratio: String
+  Druggability_Score_drugnome_tclin_and_tchem: String
+  logFC_rnaseq_PMID37080969_tardbp_fold_change: String
+  GDA_Score_MantisML_HPO: String
+  pathway_Chaperone_Mediated_Autophagy_1: String
+  GDA_Score_opentargets_overall_association_score: String
+  GDA_Score_opentargets_clingen: String
+  GDA_Score_opentargets_europepmc: String
+  pathway_Protein_processing_in_endoplasmic_reticulum___Homo_sapiens: String
+  GWAS_Beta_ot_genetics_MONDO_0004976_PMID19451621_beta: String
+  pathway_Ubiquitin_Mediated_Degradation_Of_Phosphorylated_Cdc25A_R_HSA_69601: String
+  pathway_E3_Ubiquitin_Ligases_Ubiquitinate_Target_Proteins_R_HSA_8866654: String
+  pathway_Lysosome___Homo_sapiens_human: String
+  pathway_p38_MAPK_signaling_pathway_R_HSA_450302: String
+  logFC_rnaseq_PMID37080969_sporadic_fold_change: String
+  pathway_Macroautophagy: String
+  logFC_rnaseq_PMID37080969_fus_fold_change: String
+  GWAS_Beta_ot_genetics_MONDO_0004976_PMID34873335_beta: String
+  GWAS_OR_ot_genetics_MONDO_0004976_PMID27455348_odds_ratio: String
+  Druggability_Score_drugnome_tchem: String
+  GDA_Score_opentargets_rna_expression: String
+  pathway_SUMOylation_Of_Ubiquitinylation_Proteins_R_HSA_3232142: String
+  Druggability_Score_drugnome_tclin: String
+  GDA_Score_MantisML_OT: String
+  GDA_Score_opentargets_eva: String
+  GDA_Score_opentargets_uniprot_literature: String
+  GWAS_OR_ot_genetics_MONDO_0004976_PMID18084291_odds_ratio: String
+  pathway_XBP1S_Activates_Chaperone_Genes_R_HSA_381038: String
+  pathway_Autodegradation_Of_E3_Ubiquitin_Ligase_COP1_R_HSA_349425: String
+  pathway_Longevity_regulating_pathway___Homo_sapiens_human: String
+  pathway_Oxidative_Stress_Induced_Senescence: String
 }

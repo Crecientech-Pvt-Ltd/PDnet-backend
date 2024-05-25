@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { GqlResolver } from './gql.resolver';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
 import { join } from 'path';
+import { MorganMiddleware } from '@/morgan/morgan.middleware';
 
 @Module({
   imports: [
@@ -23,4 +24,8 @@ import { join } from 'path';
   ],
   providers: [GqlResolver],
 })
-export class GqlModule {}
+export class GqlModule implements NestModule{
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(MorganMiddleware).forRoutes('/graphql');
+  }
+}
