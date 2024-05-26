@@ -24,7 +24,7 @@ import { MorganMiddleware } from '@/morgan/morgan.middleware';
   ],
   providers: [GqlResolver],
 })
-export class GqlModule implements NestModule{
+export class GqlModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(MorganMiddleware).forRoutes('/graphql');
   }

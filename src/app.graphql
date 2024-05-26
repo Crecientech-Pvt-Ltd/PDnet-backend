@@ -5,7 +5,7 @@ schema {
 type Query {
   sayHello: String
   getGenes(input: GeneInput!): [Gene!]!
-  getGeneInteractions(input: InteractionInput!): [GeneInteractionOutput!]
+  getGeneInteractions(input: InteractionInput!): GeneInteractionOutput!
 }
 
 input GeneInput {
@@ -18,14 +18,19 @@ input InteractionInput {
 }
 
 type GeneInteractionOutput {
-  gene: Gene!
-  neighbour: [RecursiveGeneInteraction!]
+  genes: [Gene!]!
+  links: [GeneInteraction!]
 }
 
-type RecursiveGeneInteraction {
-  gene: Gene!
+type GeneIndex {
+  ID: String!
+  index: Int!
+}
+
+type GeneInteraction {
+  gene1: GeneIndex!
+  gene2: GeneIndex!
   score: Float!
-  neighbour: [RecursiveGeneInteraction!]
 }
 
 type Gene {

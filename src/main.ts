@@ -11,7 +11,7 @@ async function bootstrap() {
   // app.use(MorganMiddleware);
   await app.listen(3000);
 }
-bootstrap().catch(e => {
-	Logger.error(`❌  Error starting server, ${e}`, '', 'Bootstrap', false)
-	process.exit(1);
+bootstrap().catch((e) => {
+  Logger.error(`❌  Error starting server, ${e}`, '', 'Bootstrap', false);
+  process.exit(1);
 });

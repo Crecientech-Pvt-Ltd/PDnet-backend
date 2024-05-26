@@ -108,23 +108,28 @@ export class Gene {
     universal_ID?: Nullable<string>;
 }
 
+export class GeneIndex {
+    ID: string;
+    index: number;
+}
+
+export class GeneInteraction {
+    gene1: GeneIndex;
+    gene2: GeneIndex;
+    score: number;
+}
+
 export class GeneInteractionOutput {
-    gene: Gene;
-    neighbour?: Nullable<RecursiveGeneInteraction[]>;
+    genes: Gene[];
+    links?: Nullable<GeneInteraction[]>;
 }
 
 export abstract class IQuery {
-    abstract getGeneInteractions(input: InteractionInput): Nullable<GeneInteractionOutput[]> | Promise<Nullable<GeneInteractionOutput[]>>;
+    abstract getGeneInteractions(input: InteractionInput): GeneInteractionOutput | Promise<GeneInteractionOutput>;
 
     abstract getGenes(input: GeneInput): Gene[] | Promise<Gene[]>;
 
     abstract sayHello(): Nullable<string> | Promise<Nullable<string>>;
-}
-
-export class RecursiveGeneInteraction {
-    gene: Gene;
-    neighbour?: Nullable<RecursiveGeneInteraction[]>;
-    score: number;
 }
 
 type Nullable<T> = T | null;
