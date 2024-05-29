@@ -2,7 +2,11 @@
   "name": "pdnet",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": {
+    "name": "Bhupesh Dewangan",
+    "email": "bhupeshdewangan20@gmail.com"
+  },
+  "main": "dist/main.js",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -29,6 +33,7 @@
     "@nestjs/graphql": "^12.1.1",
     "@nestjs/platform-express": "^10.0.0",
     "compression": "^1.7.4",
+    "morgan": "^1.10.0",
     "neo4j-driver": "^5.20.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",

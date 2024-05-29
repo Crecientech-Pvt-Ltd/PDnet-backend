@@ -4,7 +4,7 @@ import {
   GeneInput,
   GeneInteractionOutput,
   InteractionInput,
-} from '@/gql/gql.schema';
+} from './gql.schema';
 import { Neo4jService } from '@/neo4j/neo4j.service';
 import { QueryResult } from 'neo4j-driver';
 import { Logger } from '@nestjs/common';
@@ -61,9 +61,13 @@ export class GqlResolver {
       geneIDs,
       minScore,
     });
+    const val = result.records[0].get('result');
+
+    this.logger.log(`Found ${val.genes.length} genes and ${val.links.length} links.`);
+
     return {
-      genes: result.records[0].get('result').genes.map((gene) => gene.properties),
-      links: result.records[0].get('result').links.map((link) => ({
+      genes: val.genes.map((gene) => gene.properties),
+      links: val.links.map((link) => ({
         gene1: {
           ID: link.gene1.ID,
           index: link.gene1.index.low,

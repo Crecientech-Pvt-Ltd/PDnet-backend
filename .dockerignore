@@ -1,0 +1,7 @@
+.git/
+node_modules/
+!.dockerignore
+src/**/*.test.ts
+test/
+.vscode/
+.env*

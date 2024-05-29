@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppController } from '@/app.controller';
-import { AppService } from '@/app.service';
 import { Neo4jModule } from '@/neo4j/neo4j.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GqlModule } from '@/gql/gql.module';
@@ -8,7 +7,9 @@ import { Neo4jScheme } from './interfaces/neo4j-config.interface';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true,
+       envFilePath: process.env.NODE_ENV !== 'production' ? '.env.local' : undefined
+     }),
     Neo4jModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         scheme: configService.get<Neo4jScheme>('NEO4J_SCHEME'),
@@ -23,6 +24,5 @@ import { Neo4jScheme } from './interfaces/neo4j-config.interface';
     GqlModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
