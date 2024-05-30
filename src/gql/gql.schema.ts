@@ -125,7 +125,7 @@ export class GeneInteractionOutput {
 }
 
 export abstract class IQuery {
-    abstract getGeneInteractions(input: InteractionInput): GeneInteractionOutput | Promise<GeneInteractionOutput>;
+    abstract getGeneInteractions(input: InteractionInput, order: number): GeneInteractionOutput | Promise<GeneInteractionOutput>;
 
     abstract getGenes(input: GeneInput): Gene[] | Promise<Gene[]>;
 
