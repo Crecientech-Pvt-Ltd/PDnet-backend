@@ -27,7 +27,7 @@ export class GqlResolver {
     const query = `
       WITH $geneIDs AS geneIDs
       MATCH (g:Gene)
-      WHERE g.ID IN geneIDs OR g.\`Gene name\` IN geneIDs
+      WHERE g.ID IN geneIDs OR g.Gene_name IN geneIDs
       RETURN g
     `;
     const result: QueryResult<any> = await session.run(query, { geneIDs });
@@ -63,9 +63,9 @@ export class GqlResolver {
     } else {
       query = `
         WITH $geneIDs AS geneIDs
-        MATCH (g:Gene) WHERE g.ID IN geneIDs
+        MATCH (g:Gene) WHERE (g.ID IN geneIDs OR g.Gene_name IN geneIDs)
         WITH g AS g1, geneIDs
-        MATCH (g1:Gene)-[r:GENE_GENE_CONNECTION]->(g2:Gene) WHERE r.score >= $minScore AND g2.ID IN geneIDs
+        MATCH (g1:Gene)-[r:GENE_GENE_CONNECTION]->(g2:Gene) WHERE r.score >= $minScore AND (g2.ID IN geneIDs OR g2.Gene_name IN geneIDs)
         WITH COLLECT({gene1: g1, gene2: g2, score: r.score}) AS connections, COLLECT(g1) AS genes
         RETURN {
             genes: genes,
