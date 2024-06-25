@@ -64,9 +64,11 @@ export class GqlResolver {
       query = `
         WITH $geneIDs AS geneIDs
         MATCH (g:Gene) WHERE (g.ID IN geneIDs OR g.Gene_name IN geneIDs)
-        WITH g AS g1, geneIDs
-        MATCH (g1:Gene)-[r:GENE_GENE_CONNECTION]->(g2:Gene) WHERE r.score >= $minScore AND (g2.ID IN geneIDs OR g2.Gene_name IN geneIDs)
-        WITH COLLECT({gene1: g1, gene2: g2, score: r.score}) AS connections, COLLECT(g1) AS genes
+        WITH COLLECT(g) AS genes, geneIDs
+        UNWIND genes AS g1
+        MATCH (g1)-[r:GENE_GENE_CONNECTION]->(g2:Gene)
+        WHERE r.score >= $minScore AND (g2.ID IN geneIDs OR g2.Gene_name IN geneIDs)
+        WITH COLLECT({gene1: g1, gene2: g2, score: r.score}) AS connections, genes
         RETURN {
             genes: genes,
             links: [conn in connections | {
