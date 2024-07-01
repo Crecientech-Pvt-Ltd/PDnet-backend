@@ -8,7 +8,7 @@ export class AppController {
   ) {}
 
   @Get('count-nodes')
-  async getCount(): Promise<any> {
+  async getCount(): Promise<string> {
     const session = this.neo4jService.getSession();
     const res = await session.run(`MATCH (n) RETURN count(n) AS count`);
     return `There are ${res.records[0].get('count')} nodes in the database`;
