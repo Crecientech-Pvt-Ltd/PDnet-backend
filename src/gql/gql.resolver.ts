@@ -48,18 +48,18 @@ export class GqlResolver {
       query = `
         WITH $geneIDs AS geneIDs
         MATCH (g1:Gene)-[r:GENE_GENE_CONNECTION]->(g2:Gene)
-        WHERE (g1.ID IN geneIDs OR g1.Gene_name IN geneIDs)
+        WHERE g1.ID IN geneIDs
         AND r.score >= $minScore
         RETURN apoc.coll.toSet(COLLECT(g1) + COLLECT(g2)) AS genes, COLLECT({gene1: g1.ID, gene2: g2.ID, score: r.score}) AS connections
       `;
     } else {
       query = `
         WITH $geneIDs AS geneIDs
-        MATCH (g:Gene) WHERE (g.ID IN geneIDs OR g.Gene_name IN geneIDs)
+        MATCH (g:Gene) WHERE g.ID IN geneIDs
         WITH COLLECT(g) AS genes, geneIDs
         UNWIND genes AS g1
         MATCH (g1:Gene)-[r:GENE_GENE_CONNECTION]->(g2:Gene)
-        WHERE r.score >= $minScore AND (g2.ID IN geneIDs OR g2.Gene_name IN geneIDs)
+        WHERE r.score >= $minScore AND g2.ID IN geneIDs
         RETURN COLLECT({gene1: g1.ID, gene2: g2.ID, score: r.score}) AS connections, genes
         `;
     }

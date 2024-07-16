@@ -4,9 +4,10 @@ import {
   Logger,
   OnModuleDestroy,
   OnModuleInit,
+  VersioningOptions
 } from '@nestjs/common';
-import { Driver, Session, SessionMode } from 'neo4j-driver';
-import { Neo4jConfig } from '@/interfaces/neo4j-config.interface';
+import type { Driver, Session, SessionMode } from 'neo4j-driver';
+import type { Neo4jConfig } from '@/interfaces/neo4j-config.interface';
 import { NEO4J_CONFIG, NEO4J_DRIVER } from './neo4j.constants';
 
 @Injectable()
@@ -19,8 +20,12 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   async onModuleInit() {
-    await this.driver.getServerInfo();
-    this.logger.log('Connected to Neo4j');
+    try {
+      await this.driver.getServerInfo();
+      this.logger.log('Connected to Neo4j');
+    } catch (error) {
+      this.logger.error('Database not connected');
+    }
   }
 
   async onModuleDestroy() {

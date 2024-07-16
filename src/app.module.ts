@@ -7,9 +7,11 @@ import { Neo4jScheme } from './interfaces/neo4j-config.interface';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true,
-       envFilePath: process.env.NODE_ENV !== 'production' ? '.env.local' : undefined
-     }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath:
+        process.env.NODE_ENV !== 'production' ? '.env.local' : undefined,
+    }),
     Neo4jModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         scheme: configService.get<Neo4jScheme>('NEO4J_SCHEME'),
