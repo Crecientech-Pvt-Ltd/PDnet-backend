@@ -99,7 +99,7 @@ export class Gene {
     pathway_Ubiquitin_Mediated_Degradation_Of_Phosphorylated_Cdc25A_R_HSA_69601?: Nullable<string>;
     pathway_Ubiquitin_dependent_Degradation_Of_Cyclin_D_R_HSA_75815?: Nullable<string>;
     pathway_Ubiquitin_mediated_proteolysis?: Nullable<string>;
-    pathway_Ubiquitination_And_Proteasome_Degradation_R_HSA_83168?: Nullable<string>;
+    pathway_Ubiquitination_And_Proteasome_Degradation_R_HSA_983168?: Nullable<string>;
     pathway_Unfolded_Protein_Response_UPR_R_HSA_381119?: Nullable<string>;
     pathway_Vesicle_mediated_transport?: Nullable<string>;
     pathway_XBP1S_Activates_Chaperone_Genes_R_HSA_381038?: Nullable<string>;
