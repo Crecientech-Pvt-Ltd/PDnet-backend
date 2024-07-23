@@ -7,7 +7,7 @@ import {
   VersioningOptions
 } from '@nestjs/common';
 import type { Driver, Session, SessionMode } from 'neo4j-driver';
-import type { Neo4jConfig } from '@/interfaces/neo4j-config.interface';
+import type { Neo4jConfig } from '@/interfaces';
 import { NEO4J_CONFIG, NEO4J_DRIVER } from './neo4j.constants';
 
 @Injectable()

@@ -10,7 +10,7 @@ import { Neo4jScheme } from './interfaces/neo4j-config.interface';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:
-        process.env.NODE_ENV !== 'production' ? '.env.local' : undefined,
+        process.env.NODE_ENV !== 'development' ? '.env.local' : '.env',
     }),
     Neo4jModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({

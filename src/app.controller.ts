@@ -7,6 +7,11 @@ export class AppController {
     private readonly neo4jService: Neo4jService,
   ) {}
 
+  @Get()
+  async getHello(): Promise<string> {
+    return 'Hello World!';
+  }
+
   @Get('count-nodes')
   async getCount(): Promise<string> {
     const session = this.neo4jService.getSession();

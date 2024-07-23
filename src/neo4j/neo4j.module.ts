@@ -2,7 +2,7 @@ import { Module, DynamicModule, InjectionToken } from '@nestjs/common';
 import { Neo4jService } from './neo4j.service';
 import { NEO4J_CONFIG, NEO4J_DRIVER } from './neo4j.constants';
 import { createDriver } from './neo4j.util';
-import { Neo4jConfig } from '@/interfaces/neo4j-config.interface';
+import { Neo4jConfig } from '@/interfaces';
 
 @Module({})
 export class Neo4jModule {

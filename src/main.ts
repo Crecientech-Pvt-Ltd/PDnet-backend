@@ -10,6 +10,6 @@ async function bootstrap() {
   await app.listen(3000);
 }
 bootstrap().catch((e) => {
-  Logger.error(`❌  Error starting server, ${e}`, '', 'Bootstrap', false);
+  Logger.error(`❌  Error starting server. \n ${e}`);
   process.exit(1);
 });
