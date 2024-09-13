@@ -97,7 +97,8 @@ export class GqlResolver {
         MATCH (g1:Gene)-[r:${interactionType}]->(g2:Gene)
         WHERE g1.ID IN geneIDs
         AND r.score >= $minScore
-        RETURN apoc.coll.toSet(COLLECT(g1) + COLLECT(g2)) AS genes, COLLECT({gene1: g1.ID, gene2: g2.ID, score: r.score}) AS connections
+        WITH apoc.coll.toSet(COLLECT(g1) + COLLECT(g2)) AS _genes, COLLECT({gene1: g1.ID, gene2: g2.ID, score: r.score}) AS _connections
+        RETURN _genes[0..${process.env.NODES_LIMIT || 5000}] AS genes, _connections[0..${process.env.EDGES_LIMIT || 10000}] AS connections
       `;
     } else {
       query = `
@@ -105,7 +106,8 @@ export class GqlResolver {
         MATCH (g1:Gene)-[r1:${interactionType}]->(g2:Gene)-[r2:${interactionType}]->(g3:Gene)
         WHERE g1.ID IN geneIDs
         AND r1.score >= $minScore AND r2.score >= $minScore
-        RETURN apoc.coll.toSet(COLLECT(g1) + COLLECT(g2) + COLLECT(g3)) AS genes, COLLECT({gene1: g1.ID, gene2: g2.ID, score: r1.score}) + COLLECT({gene1: g2.ID, gene2: g3.ID, score: r2.score}) AS connections
+        WITH apoc.coll.toSet(COLLECT(g1) + COLLECT(g2) + COLLECT(g3)) AS _genes, COLLECT({gene1: g1.ID, gene2: g2.ID, score: r1.score}) + COLLECT({gene1: g2.ID, gene2: g3.ID, score: r2.score}) AS _connections
+        RETURN _genes[0..${process.env.NODES_LIMIT || 5000}] AS genes, _connections[0..${process.env.EDGES_LIMIT || 10000}] AS connections
       `;
     }
     const result: QueryResult<any> = await session.run(query, {
