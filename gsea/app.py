@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Query
-from typing import List
+from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import math
 from scipy.stats import hypergeom
@@ -8,9 +8,17 @@ KEGG_FILE_PATH = "KEGG_2021_Human.csv"
 df = pd.read_csv(KEGG_FILE_PATH)
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
 
 
-def calculate_odds_ratio(overlap_count: int, expected_overlap: float, epsilon=1e-10) -> float:
+def calculate_odds_ratio(
+    overlap_count: int, expected_overlap: float, epsilon=1e-10
+) -> float:
     """
     Calculate the odds ratio
 
@@ -73,7 +81,9 @@ def check_overlap(genes: list[str], pathway_genes: list[str]) -> list[str]:
     return [gene for gene in genes if gene in pathway_genes]
 
 
-def calculate_p_value(overlap_count: int, pathway_size: int, gene_list_size: int, total_genes: int) -> float:
+def calculate_p_value(
+    overlap_count: int, pathway_size: int, gene_list_size: int, total_genes: int
+) -> float:
     """
     Calculate the p-value using the hypergeometric distribution
 
@@ -186,12 +196,14 @@ def process_kegg_pathways(gene_list: list[str], total_genes=20000):
 
     for i, entry in enumerate(result):
         entry["Adjusted P-value"] = adjusted_p_values[i]
-
+    result.sort(key=lambda x: x["P-value"], reverse=True)
     return result
 
 
 @app.get("/gsea")
-def gsea(gene_list: str = Query(..., description="Comma-separated list of genes")):
+async def gsea(
+    gene_list: str = Query(..., description="Comma-separated list of genes")
+):
     """
     Perform Gene Set Enrichment Analysis (GSEA) using KEGG pathways
 
@@ -199,7 +211,7 @@ def gsea(gene_list: str = Query(..., description="Comma-separated list of genes"
     ----------
     gene_list : str
         Comma-separated list of genes
-    
+
     Returns
     -------
     result : list[dict]
@@ -213,4 +225,5 @@ def gsea(gene_list: str = Query(..., description="Comma-separated list of genes"
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
