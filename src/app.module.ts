@@ -3,14 +3,14 @@ import { AppController } from '@/app.controller';
 import { Neo4jModule } from '@/neo4j/neo4j.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GqlModule } from '@/gql/gql.module';
-import { Neo4jScheme } from './interfaces/neo4j-config.interface';
+import type { Neo4jScheme } from './interfaces/neo4j-config.interface';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:
-        process.env.NODE_ENV !== 'development' ? '.env.local' : '.env',
+        process.env.NODE_ENV === 'development' ? '.env.local' : '.env',
     }),
     Neo4jModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
