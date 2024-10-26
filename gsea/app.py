@@ -184,7 +184,7 @@ def process_kegg_pathways(gene_list: list[str], total_genes=20000):
                 {
                     "Gene_set": gene_set,
                     "Overlap": f"{overlap_count}/{pathway_size}",
-                    "P-value": format(p_value,".2e"),
+                    "P-value": p_value,
                     "Adjusted P-value": None,  # Placeholder for now
                     "Odds Ratio": format(odds_ratio, ".2f"),
                     "Combined Score": format(combined_score, ".2f"),
@@ -192,11 +192,12 @@ def process_kegg_pathways(gene_list: list[str], total_genes=20000):
                 }
             )
 
+    result.sort(key=lambda x: x["P-value"])
     adjusted_p_values = benjamini_hochberg_correction(p_values)
 
     for i, entry in enumerate(result):
         entry["Adjusted P-value"] = format(adjusted_p_values[i], ".2e")
-    result.sort(key=lambda x: x["P-value"])
+        entry["P-value"] = format(entry["P-value"], ".2e")
     return result
 
 
