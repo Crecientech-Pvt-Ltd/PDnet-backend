@@ -4,6 +4,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
 import { join } from 'path';
 import { MorganMiddleware } from '@/morgan/morgan.middleware';
+import { GqlService } from './gql.service';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { MorganMiddleware } from '@/morgan/morgan.middleware';
       }),
     }),
   ],
-  providers: [GqlResolver],
+  providers: [GqlResolver, GqlService],
 })
 export class GqlModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

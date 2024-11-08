@@ -1,19 +1,19 @@
 import { Scalar, CustomScalar } from '@nestjs/graphql';
 import { Kind, ValueNode, print } from 'graphql';
 
-@Scalar('JSON', (type) => Object)
-export class JSONScalar implements CustomScalar<string, Object> {
+@Scalar('JSON', () => Object)
+export class JSONScalar implements CustomScalar<string, object> {
   description = 'JSON custom scalar type';
 
-  parseValue(value: string): Object {
+  parseValue(value: string): object {
     return JSON.parse(value);
   }
 
-  serialize(value: Object): string {
+  serialize(value: object): string {
     return JSON.stringify(value);
   }
 
-  parseLiteral(ast: ValueNode, variables: Record<string,unknown>): Object {
+  parseLiteral(ast: ValueNode, variables: Record<string, unknown>) {
     switch (ast.kind) {
       case Kind.STRING:
       case Kind.BOOLEAN:
@@ -33,9 +33,9 @@ export class JSONScalar implements CustomScalar<string, Object> {
       case Kind.NULL:
         return null;
       case Kind.VARIABLE:
-        return variables ? variables[ast.name.value] : undefined
+        return variables ? variables[ast.name.value] : undefined;
       default:
         return new TypeError(`JSON cannot represent value: ${print(ast)}`);
-    } 
+    }
   }
 }

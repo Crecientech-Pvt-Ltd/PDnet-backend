@@ -7,7 +7,10 @@ schema {
 type Query {
   sayHello: String
   getGenes(input: GeneInput!): [Gene!]!
-  getGeneInteractions(input: InteractionInput!, order: Int!): GeneInteractionOutput!
+  getGeneInteractions(
+    input: InteractionInput!
+    order: Int!
+  ): GeneInteractionOutput!
 }
 
 input GeneInput {
@@ -18,11 +21,21 @@ input InteractionInput {
   geneIDs: [String!]!
   minScore: Float!
   interactionType: String!
+  graphName: String
+}
+
+type GeneBase {
+    ID: ID!
+    Description: String
+    Gene_name: String
+    hgnc_gene_id: String
+    hgnc_gene_symbol: String
 }
 
 type GeneInteractionOutput {
   genes: [Gene!]!
   links: [GeneInteraction!]
+  graphName: String
 }
 
 type GeneIndex {
