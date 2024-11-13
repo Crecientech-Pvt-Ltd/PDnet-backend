@@ -1,11 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Neo4jService } from '@/neo4j/neo4j.service';
-import {
-  FIRST_ORDER_GENES_QUERY,
-  LEIDEN_QUERY,
-  RENEW_QUERY,
-} from '@/neo4j/neo4j.constants';
-import { GraphConfigDto } from '@/algorithm/algorithm.dto';
+import { LEIDEN_QUERY } from '@/neo4j/neo4j.constants';
 
 @Injectable()
 export class AlgorithmService {
@@ -32,7 +27,7 @@ export class AlgorithmService {
 
   async louvain(graphName: string, resolution: number, weighted: boolean) {
     if (!(await this.neo4jService.graphExists(graphName))) return;
-    const session = this.neo4jService.getSession(graphName);
+    const session = this.neo4jService.getSession();
     const response = (
       await session.run(LEIDEN_QUERY(weighted), { graphName, resolution })
     ).records;
@@ -53,33 +48,5 @@ export class AlgorithmService {
       },
       {} as Record<string, { name: string; genes: string[]; color: string }>,
     );
-  }
-
-  async renewSession(graphConfig: GraphConfigDto) {
-    if (await this.neo4jService.graphExists(graphConfig.graphName))
-      return false;
-    const session = this.neo4jService.getSession(graphConfig.graphName);
-    if (graphConfig.order === 2) {
-      graphConfig.order = 0;
-      graphConfig.geneIDs = (
-        await session.run<{ geneIDs: string[] }>(
-          FIRST_ORDER_GENES_QUERY(graphConfig.interactionType),
-          {
-            geneIDs: graphConfig.geneIDs,
-            minScore: graphConfig.minScore,
-          },
-        )
-      ).records[0].get('geneIDs');
-    }
-    await session.run(
-      RENEW_QUERY(graphConfig.order, graphConfig.interactionType),
-      {
-        geneIDs: graphConfig.geneIDs,
-        minScore: graphConfig.minScore,
-        graphName: graphConfig.graphName,
-      },
-    );
-    await this.neo4jService.releaseSession(session);
-    return true;
   }
 }

@@ -1,4 +1,4 @@
-import { Resolver, Query, Args, Info } from '@nestjs/graphql';
+import { Resolver, Query, Args, Context } from '@nestjs/graphql';
 import {
   Gene,
   GeneBase,
@@ -6,20 +6,35 @@ import {
   GeneInteractionOutput,
   InteractionInput,
 } from './gql.schema';
-import { Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { DiseaseNames } from '@/decorators';
 import { GqlService } from './gql.service';
-import type { GraphQLResolveInfo } from 'graphql';
+import { RedisService } from '@/redis/redis.service';
+import { isUUID } from 'class-validator';
+import { ConfigService } from '@nestjs/config';
 
 @Resolver('gql')
 export class GqlResolver {
-  constructor(private readonly gqlService: GqlService) {}
+  constructor(
+    private readonly gqlService: GqlService,
+    private readonly redisService: RedisService,
+    private readonly configService: ConfigService,
+  ) {}
 
   private logger = new Logger(GqlResolver.name);
 
   @Query(() => String)
-  async sayHello(): Promise<string> {
-    return 'Hello World!';
+  async getUserID(
+    @Context('req') { headers }: { headers: Record<string, string> },
+  ): Promise<string> {
+    const header = headers['x-user-id'] || crypto.randomUUID();
+    await this.redisService.redisClient.set(
+      `user:${header}`,
+      '',
+      'EX',
+      this.configService.get<number>('REDIS_USER_EXPIRY', 7200),
+    );
+    return header;
   }
 
   @Query(() => [Gene])
@@ -39,22 +54,25 @@ export class GqlResolver {
   async getGeneInteractions(
     @Args('input') input: InteractionInput,
     @Args('order') order: number,
-    @Info() info: GraphQLResolveInfo,
-    @DiseaseNames({ depth: 1, fieldName: 'genes' })
-    diseaseNamesInfo: [Array<string>, boolean],
+    @DiseaseNames() diseaseNamesInfo: [Array<string>, boolean],
+    @Context('req') { headers }: { headers: Record<string, string> },
   ): Promise<GeneInteractionOutput> {
+    const header = headers['x-user-id'];
+    if (!isUUID(header)) throw new HttpException('Correct user ID not found', HttpStatus.UNAUTHORIZED);
     const graphName =
       input.graphName ??
       this.gqlService.computeHash(
         JSON.stringify({
-          ...info.variableValues,
+          ...input,
           geneIDs: input.geneIDs.sort(),
+          order,
         }),
       );
     const result = await this.gqlService.getGeneInteractions(
       input,
       order,
       graphName,
+      header,
     );
     this.logger.log(
       `Genes: ${result.genes.length}, Links: ${result.links.length}`,

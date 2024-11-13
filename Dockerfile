@@ -12,6 +12,5 @@ FROM node:22.1-alpine
 WORKDIR /usr/src/app
 COPY --from=builder /usr/src/app/dist ./dist
 COPY package*.json ./
-ENV NODE_ENV=production
-RUN npm install --only=production
-CMD ["node", "dist/main.js"]
+RUN npm install --omit=dev
+CMD ["node", "run", "start:prod"]

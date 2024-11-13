@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { GqlResolver } from './gql.resolver';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
-import { join } from 'path';
+import { join } from 'node:path';
 import { MorganMiddleware } from '@/morgan/morgan.middleware';
 import { GqlService } from './gql.service';
 

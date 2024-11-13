@@ -62,9 +62,10 @@ export class GqlService {
     input: InteractionInput,
     order: number,
     graphName: string,
+    userID: string,
   ) {
     const graphExists = await this.neo4jService.graphExists(graphName);
-    const session = this.neo4jService.getSession(graphName);
+    const session = this.neo4jService.getSession();
     if (order === 2) {
       order = 0;
       input.geneIDs = (
@@ -85,6 +86,7 @@ export class GqlService {
       minScore: input.minScore,
       graphName,
     });
+    await this.neo4jService.bindGraph(graphName, `user:${userID}`);
     await this.neo4jService.releaseSession(session);
     return {
       genes:
