@@ -54,11 +54,15 @@ export class GqlResolver {
   async getGeneInteractions(
     @Args('input') input: InteractionInput,
     @Args('order') order: number,
-    @DiseaseNames() diseaseNamesInfo: [Array<string>, boolean],
+    @DiseaseNames({ depth: 1, fieldName: 'genes' }) diseaseNamesInfo: [Array<string>, boolean],
     @Context('req') { headers }: { headers: Record<string, string> },
   ): Promise<GeneInteractionOutput> {
-    const header = headers['x-user-id'];
-    if (!isUUID(header)) throw new HttpException('Correct user ID not found', HttpStatus.UNAUTHORIZED);
+    const header = headers['x-user-id'] || crypto.randomUUID();
+    if (!isUUID(header))
+      throw new HttpException(
+        'Correct user ID not found',
+        HttpStatus.UNAUTHORIZED,
+      );
     const graphName =
       input.graphName ??
       this.gqlService.computeHash(
@@ -84,6 +88,7 @@ export class GqlResolver {
       },
       {} as Record<string, number>,
     );
+    console.log(diseaseNamesInfo);
     return {
       genes: await this.gqlService.filterGenesByDisease(
         result.genes,

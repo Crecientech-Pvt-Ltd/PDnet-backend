@@ -68,7 +68,7 @@ function getDiseaseNames(
             depth: options.depth - 1,
           });
           isCommon ||= result[1];
-          diseaseNames.concat(result[0]);
+          diseaseNames.push(...result[0]);
         }
       }
     }
