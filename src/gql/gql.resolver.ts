@@ -88,7 +88,6 @@ export class GqlResolver {
       },
       {} as Record<string, number>,
     );
-    console.log(diseaseNamesInfo);
     return {
       genes: await this.gqlService.filterGenesByDisease(
         result.genes,
