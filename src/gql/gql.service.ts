@@ -1,14 +1,27 @@
 import {
   GET_GENES_QUERY,
-  DISEASE_DEPENDENT_FIELDS,
-  DISEASE_INDEPENDENT_FIELDS,
   GENE_INTERACTIONS_QUERY,
   FIRST_ORDER_GENES_QUERY,
+  GET_HEADERS_QUERY,
 } from '@/neo4j/neo4j.constants';
 import { Neo4jService } from '@/neo4j/neo4j.service';
 import { Injectable } from '@nestjs/common';
-import { Gene, GeneBase, InteractionInput } from './gql.schema';
+import {
+  Gene,
+  InteractionInput,
+  DataRequired,
+  Header,
+  GeneBase,
+} from './models';
 import { createHash } from 'node:crypto';
+
+export interface GetGenesResult {
+  ID: string;
+  Gene_name?: string;
+  Description?: string;
+  hgnc_gene_id?: string;
+  [property: string]: string;
+}
 
 @Injectable()
 export class GqlService {
@@ -16,42 +29,40 @@ export class GqlService {
 
   async getGenes(
     geneIDs: string[],
-    bringTotalData = true,
-  ): Promise<Array<Record<string, string> | GeneBase>> {
-    const session = this.neo4jService.getSession();
-    const result = await session.run(GET_GENES_QUERY(bringTotalData), {
-      geneIDs: geneIDs.map((val) => val.toUpperCase()),
-    });
-    await this.neo4jService.releaseSession(session);
-    return result.records.map<Record<string, string>>((record) =>
-      bringTotalData ? record.get('genes').properties : record.get('genes'),
+    config?: Array<DataRequired> | undefined,
+    bringMeta = true,
+  ) {
+    const properties = config?.flatMap((item) =>
+      item.properties.map(
+        (prop) => `${item.disease ? `${item.disease}_` : ''}${prop}`,
+      ),
     );
+    const session = this.neo4jService.getSession();
+    const result = await session.run<{ genes: GetGenesResult }>(
+      GET_GENES_QUERY(properties, bringMeta),
+      { geneIDs },
+    );
+    await this.neo4jService.releaseSession(session);
+    return result.records.map((record) => record.get('genes'));
   }
 
-  async filterGenesByDisease(genes: any[], diseaseNames: string[]) {
-    return genes.map<Gene>((gene) => {
+  async filterGenes(genes: Array<GetGenesResult>, config: Array<DataRequired>) {
+    return genes.map<Gene>((gene: any) => {
       gene.common = {};
-      for (const diseaseName of diseaseNames) {
-        gene[diseaseName] = {};
-      }
-      for (const key in gene) {
-        diseaseNames.forEach((disease) => {
-          if (
-            DISEASE_DEPENDENT_FIELDS.some((field) =>
-              key.startsWith(`${disease}_${field}_`),
-            )
-          ) {
-            gene[disease][key.slice(disease.length + 1)] = gene[key];
-            delete gene[key];
+      gene.disease = {};
+      for (const { disease: diseaseName, properties } of config) {
+        if (!diseaseName) {
+          for (const prop of properties) {
+            gene.common[prop] = gene[prop];
+            delete gene[prop];
           }
-        });
-        if (
-          DISEASE_INDEPENDENT_FIELDS.some((field) =>
-            key.startsWith(`${field}_`),
-          )
-        ) {
-          gene.common[key] = gene[key];
-          delete gene[key];
+        } else {
+          gene.disease[diseaseName] = {};
+          for (const prop of properties) {
+            const propName = `${diseaseName}_${prop}`;
+            gene.disease[diseaseName][prop] = gene[propName];
+            delete gene[propName];
+          }
         }
       }
       return gene;
@@ -79,8 +90,8 @@ export class GqlService {
       ).records[0].get('geneIDs');
     }
     const result = await session.run<{
-      genes: Array<Record<string, any>>;
-      connections: Array<{ gene1: string; gene2: string; score: number }>;
+      genes: Array<GeneBase>;
+      links: Array<{ gene1: string; gene2: string; score: number }>;
     }>(GENE_INTERACTIONS_QUERY(order, input.interactionType, graphExists), {
       geneIDs: input.geneIDs,
       minScore: input.minScore,
@@ -89,15 +100,24 @@ export class GqlService {
     await this.neo4jService.bindGraph(graphName, `user:${userID}`);
     await this.neo4jService.releaseSession(session);
     return {
-      genes:
-        result.records[0]
-          ?.get('genes')
-          .map<Record<string, string>>((g) => g.properties) ?? [],
-      links: result.records[0]?.get('connections') ?? [],
+      genes: result.records[0]?.get('genes') ?? [],
+      links: result.records[0]?.get('links') ?? [],
     };
   }
 
   computeHash(query: string) {
     return createHash('sha256').update(query).digest('hex');
+  }
+
+  async getHeaders(disease?: string): Promise<Header> {
+    const session = this.neo4jService.getSession();
+    const result = await session.run<
+      Record<'diseaseHeader' | 'commonHeader', string[]>
+    >(GET_HEADERS_QUERY(disease));
+    await this.neo4jService.releaseSession(session);
+    return {
+      disease: result.records[0].get('diseaseHeader'),
+      common: result.records[0].get('commonHeader'),
+    };
   }
 }

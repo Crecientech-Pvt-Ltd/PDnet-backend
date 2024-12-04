@@ -1,0 +1,64 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input DataRequired {
+  disease: String
+  properties: [String!]!
+}
+
+type Gene {
+  Description: String
+  Gene_name: String
+  ID: String!
+  common: JSON
+  disease: JSON
+  hgnc_gene_id: String
+}
+
+type GeneBase {
+  Description: String
+  Gene_name: String
+  ID: String!
+}
+
+type GeneIndex {
+  ID: String!
+  index: Int!
+}
+
+type GeneInteraction {
+  gene1: GeneIndex!
+  gene2: GeneIndex!
+  score: Float!
+}
+
+type GeneInteractionOutput {
+  genes: [GeneBase!]!
+  graphName: String
+  links: [GeneInteraction!]
+}
+
+type Header {
+  common: [String!]
+  disease: [String!]
+}
+
+input InteractionInput {
+  geneIDs: [String!]!
+  graphName: String
+  interactionType: String!
+  minScore: Float!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type Query {
+  getGeneInteractions(input: InteractionInput!, order: Int!): [GeneInteractionOutput!]!
+  getGenes(config: [DataRequired!], geneIDs: [String!]!): [Gene!]!
+  getHeaders(disease: String): Header!
+  getUserID: String!
+}

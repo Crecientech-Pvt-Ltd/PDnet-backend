@@ -1,17 +1,17 @@
-import { Resolver, Query, Args, Context } from '@nestjs/graphql';
-import {
-  Gene,
-  GeneBase,
-  GeneInput,
-  GeneInteractionOutput,
-  InteractionInput,
-} from './gql.schema';
+import { Resolver, Query, Args, Context, Info, Int } from '@nestjs/graphql';
 import { HttpException, HttpStatus, Logger } from '@nestjs/common';
-import { DiseaseNames } from '@/decorators';
 import { GqlService } from './gql.service';
 import { RedisService } from '@/redis/redis.service';
 import { isUUID } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
+import {
+  DataRequired,
+  Gene,
+  GeneInteractionOutput,
+  Header,
+  InteractionInput,
+} from './models';
+import type { FieldNode, GraphQLResolveInfo } from 'graphql';
 
 @Resolver('gql')
 export class GqlResolver {
@@ -39,25 +39,33 @@ export class GqlResolver {
 
   @Query(() => [Gene])
   async getGenes(
-    @Args('input') input: GeneInput,
-    @DiseaseNames() diseaseNamesInfo: [Array<string>, boolean],
+    @Args('geneIDs', { type: () => [String] }) geneIDs: string[],
+    @Args('config', { type: () => [DataRequired], nullable: true })
+    config: Array<DataRequired> | undefined,
+    @Info() info: GraphQLResolveInfo,
   ): Promise<Gene[]> {
-    const bringTotalData =
-      diseaseNamesInfo[0].length > 0 || diseaseNamesInfo[1];
-    const genes = await this.gqlService.getGenes(input.geneIDs, bringTotalData);
-    return bringTotalData
-      ? this.gqlService.filterGenesByDisease(genes, diseaseNamesInfo[0])
-      : (genes as GeneBase[]);
+    const bringMeta = info.fieldNodes[0].selectionSet.selections.some(
+      (selection: FieldNode) =>
+        !['ID', 'common', 'disease'].includes(selection?.name.value),
+    );
+    const genes = await this.gqlService.getGenes(geneIDs, config, bringMeta);
+    return config ? this.gqlService.filterGenes(genes, config) : genes;
+  }
+
+  @Query(() => Header)
+  async getHeaders(
+    @Args('disease', { type: () => String, nullable: true }) disease?: string,
+  ) {
+    return this.gqlService.getHeaders(disease);
   }
 
   @Query(() => [GeneInteractionOutput])
   async getGeneInteractions(
-    @Args('input') input: InteractionInput,
-    @Args('order') order: number,
-    @DiseaseNames({ depth: 1, fieldName: 'genes' }) diseaseNamesInfo: [Array<string>, boolean],
+    @Args('input', { type: () => InteractionInput }) input: InteractionInput,
+    @Args('order', { type: () => Int }) order: number,
     @Context('req') { headers }: { headers: Record<string, string> },
   ): Promise<GeneInteractionOutput> {
-    const header = headers['x-user-id'] || crypto.randomUUID();
+    const header = headers['x-user-id'];
     if (!isUUID(header))
       throw new HttpException(
         'Correct user ID not found',
@@ -89,10 +97,7 @@ export class GqlResolver {
       {} as Record<string, number>,
     );
     return {
-      genes: await this.gqlService.filterGenesByDisease(
-        result.genes,
-        diseaseNamesInfo[0],
-      ),
+      genes: result.genes,
       links: result.links.map((link) => ({
         gene1: {
           ID: link.gene1,

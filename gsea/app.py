@@ -1,17 +1,22 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import math
 from scipy.stats import hypergeom
 
-KEGG_FILE_PATH = "KEGG_2021_Human.csv"
-df = pd.read_csv(KEGG_FILE_PATH)
+KEGG_FILE_PATH = "pathway_kegg_gsea.csv"
+REACTONE_FILE_PATH = "pathway_reactome_gsea.csv"
+
+df_kegg = pd.read_csv(KEGG_FILE_PATH).dropna()
+df_reactome = pd.read_csv(REACTONE_FILE_PATH).dropna()
+
+df = pd.concat([df_kegg, df_reactome], ignore_index=True)
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["GET"],
+    allow_methods=["GET","POST"],
     allow_headers=["*"],
 )
 
@@ -166,7 +171,7 @@ def process_kegg_pathways(gene_list: list[str], total_genes=20000):
 
         gene_set = row.iloc[0]
 
-        pathway_genes = row[1:].dropna().astype(str).tolist()
+        pathway_genes = str(row[1]).split(" ")
 
         overlap_genes = check_overlap(gene_list, pathway_genes)
 
@@ -221,6 +226,29 @@ async def gsea(
 
     genes = gene_list.split(",")
     result = process_kegg_pathways(genes)
+    return result
+
+@app.post("/gsea")
+async def gsea_post(
+    gene_list: list[str] = Body(
+        ..., title="Gene List", description="Comma-separated list of genes"
+    )
+):
+    """
+    Perform Gene Set Enrichment Analysis (GSEA) using pathways
+
+    Parameters
+    ----------
+    gene_list : str
+        Comma-separated list of genes
+
+    Returns
+    -------
+    result : list[dict]
+        List of dictionaries containing the results
+    """
+
+    result = process_kegg_pathways(gene_list)
     return result
 
 
