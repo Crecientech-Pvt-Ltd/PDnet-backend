@@ -10,7 +10,7 @@ export function GET_GENES_QUERY(
 ): string {
   return `MATCH (g:Gene)
     WHERE g.ID IN $geneIDs OR g.Gene_name IN $geneIDs
-    RETURN g { ${properties ? `${properties.map((prop) => `.\`${prop}\``).join(', ')},` : ''} ${bringMeta ? '.Gene_name, .Description, .hgnc_gene_id, .hgnc_gene_symbol, ' : ''} .ID } AS genes`;
+    RETURN g { ${properties ? `${properties.map((prop) => `.\`${prop}\``).join(', ')},` : ''} ${bringMeta ? '.Gene_name, .Description, .hgnc_gene_id,' : ''} .ID } AS genes`;
 }
 
 export function GENE_INTERACTIONS_QUERY(
