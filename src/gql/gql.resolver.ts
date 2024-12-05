@@ -59,7 +59,7 @@ export class GqlResolver {
     return this.gqlService.getHeaders(disease);
   }
 
-  @Query(() => [GeneInteractionOutput])
+  @Query(() => GeneInteractionOutput)
   async getGeneInteractions(
     @Args('input', { type: () => InteractionInput }) input: InteractionInput,
     @Args('order', { type: () => Int }) order: number,
