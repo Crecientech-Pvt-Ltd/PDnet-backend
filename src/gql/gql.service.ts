@@ -32,11 +32,7 @@ export class GqlService {
     config?: Array<DataRequired> | undefined,
     bringMeta = true,
   ) {
-    const properties = config?.flatMap((item) =>
-      item.properties.map(
-        (prop) => `${item.disease ? `${item.disease}_` : ''}${prop}`,
-      ),
-    );
+    const properties = config?.flatMap((item) => item.properties);
     const session = this.neo4jService.getSession();
     const result = await session.run<{ genes: GetGenesResult }>(
       GET_GENES_QUERY(properties, bringMeta),
@@ -59,9 +55,8 @@ export class GqlService {
         } else {
           gene.disease[diseaseName] = {};
           for (const prop of properties) {
-            const propName = `${diseaseName}_${prop}`;
-            gene.disease[diseaseName][prop] = gene[propName];
-            delete gene[propName];
+            gene.disease[diseaseName][prop] = gene[prop];
+            delete gene[prop];
           }
         }
       }
