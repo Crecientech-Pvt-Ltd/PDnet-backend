@@ -6,7 +6,7 @@ import {
 } from '@/neo4j/neo4j.constants';
 import { Neo4jService } from '@/neo4j/neo4j.service';
 import { Injectable } from '@nestjs/common';
-import {
+import type {
   Gene,
   InteractionInput,
   DataRequired,
@@ -20,7 +20,8 @@ export interface GetGenesResult {
   Gene_name?: string;
   Description?: string;
   hgnc_gene_id?: string;
-  [property: string]: string;
+  Aliases?: string[];
+  [property: string]: string | string[] | undefined;
 }
 
 @Injectable()
@@ -39,11 +40,20 @@ export class GqlService {
       { geneIDs },
     );
     await this.neo4jService.releaseSession(session);
-    return result.records.map((record) => record.get('genes'));
+    return result.records.map((record) => {
+      const gene = record.get('genes');
+      return {
+        ...gene,
+        Aliases: gene.Aliases?.join(', '),
+      };
+    });
   }
 
-  async filterGenes(genes: Array<GetGenesResult>, config: Array<DataRequired>) {
-    return genes.map<Gene>((gene: any) => {
+  async filterGenes(
+    genes: ReturnType<typeof GqlService.prototype.getGenes>,
+    config: Array<DataRequired>,
+  ) {
+    return (await genes).map<Gene>((gene: any) => {
       gene.common = {};
       gene.disease = {};
       for (const { disease: diseaseName, properties } of config) {

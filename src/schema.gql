@@ -8,6 +8,7 @@ input DataRequired {
 }
 
 type Gene {
+  Aliases: String
   Description: String
   Gene_name: String
   ID: String!
@@ -57,7 +58,7 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 scalar JSON
 
 type Query {
-  getGeneInteractions(input: InteractionInput!, order: Int!): [GeneInteractionOutput!]!
+  getGeneInteractions(input: InteractionInput!, order: Int!): GeneInteractionOutput!
   getGenes(config: [DataRequired!], geneIDs: [String!]!): [Gene!]!
   getHeaders(disease: String): Header!
   getUserID: String!

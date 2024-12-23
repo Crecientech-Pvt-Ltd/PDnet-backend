@@ -48,7 +48,7 @@ export class GqlResolver {
       (selection: FieldNode) =>
         !['ID', 'common', 'disease'].includes(selection?.name.value),
     );
-    const genes = await this.gqlService.getGenes(geneIDs, config, bringMeta);
+    const genes = this.gqlService.getGenes(geneIDs, config, bringMeta);
     return config ? this.gqlService.filterGenes(genes, config) : genes;
   }
 

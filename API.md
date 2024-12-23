@@ -95,6 +95,7 @@ query GetGenes($config: [DataRequired!], $geneIDs: [String!]!) {
     ID
     Gene_name
     Description
+    Aliases
     common
     disease
   }
@@ -131,6 +132,7 @@ query GetGenes($config: [DataRequired!], $geneIDs: [String!]!) {
         "ID": "BRCA1",
         "Gene_name": "BRCA1",
         "Description": "Breast cancer type 1 susceptibility protein",
+        "Aliases": "BRCA1, BRCC1, BROVCA1, FANCS, IRIS, PNCA4, PPP1R53, PSCP, RNF53",
         "common": {...},
         "disease": {...}
       },
