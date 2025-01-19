@@ -145,13 +145,22 @@ query GetGenes($config: [DataRequired!], $geneIDs: [String!]!) {
 
 ### 3. **Get Headers**
 
+> [!NOTE]
+> The common headers are the same for all diseases, while the disease headers are specific to the disease. So, when changing the disease map, the common headers will remain the same, so you can omit that part in GraphQL query which reduces the amount of data transferred over the network. 
+
 - **Query**
 
 ```graphql
 query GetHeaders($disease: String) {
-  getHeaders(disease: $disease) {
-    common
-    disease
+  getHeaders(disease: "ALS") {
+    common {
+      name
+      description
+    }
+    disease {
+      name
+      description
+    }
   }
 }
 ```
@@ -160,7 +169,7 @@ query GetHeaders($disease: String) {
 
 ```json
 {
-  "query": "query GetHeaders($disease: String) { getHeaders(disease: $disease) { common disease } }",
+  "query": "query GetHeaders($disease: String) { getHeaders(disease: $disease) { common { name description } disease { name description } } }",
   "variables": {
     "disease": "PSP"
   }
@@ -171,19 +180,42 @@ query GetHeaders($disease: String) {
 {
  "data": {
   "getHeaders": {
-   "common": [
-    "hgnc_gene_id",
-    "Description",
-    "Gene_name",
-    "Database_Mendelian_GenCC_ALS",
-    "Druggability_Score_drugnome_small molecule",
+       "common": [
+        {
+          "name": "Database_Mendelian_GenCC_ALS",
+          "description": "Association score from Mendelian GenCC ALS"
+        },
+        {
+          "name": "Druggability_Score_drugnome_small molecule",
+          "description": "Druggability score from DrugNome for small molecules"
+        },
+        {
+          "name": "Pathway_Oxidative Stress Induced Senescence",
+          "description": "Pathway score for Oxidative Stress Induced Senescence"
+        },
+        {
+          "name": "TE_appendix",
+          "description": "Transcriptomic evidence from appendix"
+        }
         ...
       ],
       "disease": [
-    "ALS_GDA_Score_opentargets_overall_association_score",
-    "ALS_GDA_Score_opentargets_uniprot_variants",
-    "ALS_GDA_Score_opentargets_eva",
-    "ALS_GDA_Score_opentargets_clingen",
+        {
+          "name": "GDA_Score_opentargets_overall_association_score",
+          "description": "Overall association score from OpenTargets"
+        },
+        {
+          "name": "GDA_Score_opentargets_uniprot_variants",
+          "description": "Association score from OpenTargets based on UniProt variants"
+        },
+        {
+          "name": "GDA_Score_opentargets_eva",
+          "description": "Association score from OpenTargets based on EVA"
+        },
+        {
+          "name": "GDA_Score_opentargets_clingen",
+          "description": "Association score from OpenTargets based on ClinGen"
+        }
         ...
       ],
     }

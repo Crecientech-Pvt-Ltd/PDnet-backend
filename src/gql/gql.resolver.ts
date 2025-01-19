@@ -54,9 +54,14 @@ export class GqlResolver {
 
   @Query(() => Header)
   async getHeaders(
-    @Args('disease', { type: () => String, nullable: true }) disease?: string,
+    @Args('disease', { type: () => String }) disease: string,
+    @Info() info: GraphQLResolveInfo,
   ) {
-    return this.gqlService.getHeaders(disease);
+    const bringCommon =
+      info.fieldNodes[0].selectionSet.selections.find(
+        (val: FieldNode) => val.name.value === 'common',
+      ) !== undefined;
+    return this.gqlService.getHeaders(disease, bringCommon);
   }
 
   @Query(() => GeneInteractionOutput)

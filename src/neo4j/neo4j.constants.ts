@@ -1,8 +1,12 @@
 export const NEO4J_CONFIG: string = 'NEO4J_CONFIG';
 export const NEO4J_DRIVER: string = 'NEO4J_DRIVER';
 
-export const GET_HEADERS_QUERY = (disease?: string) =>
-  `MATCH (s:Stats) RETURN ${disease ? `s.${disease} AS diseaseHeader,` : ''} s.common AS commonHeader`;
+export const GET_HEADERS_QUERY = (bringCommon = true) =>
+  `${bringCommon ? 'MATCH (cp:Common&Property) WITH COLLECT(cp { .* }) AS commonHeader' : ''}
+  MATCH (:Disease { name: $disease })-[:HAS_PROPERTY]-(dp:Property)
+  RETURN COLLECT( dp { .* }) AS diseaseHeader ${bringCommon ? ', commonHeader' : ''}`;
+
+// MATCH (cp:Common&Property) WITH COLLECT(cp { .* })[0..5] AS common MATCH (dp:Property&!Common) RETURN COLLECT( dp { .* })[0..5] AS disease, common;
 
 export function GET_GENES_QUERY(
   properties?: string[],
