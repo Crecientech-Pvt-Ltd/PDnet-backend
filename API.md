@@ -169,7 +169,7 @@ query GetHeaders($disease: String) {
 
 ```json
 {
-  "query": "query GetHeaders($disease: String) { getHeaders(disease: $disease) { common { name description } disease { name description } } }",
+  "query": "query GetHeaders($disease: String!) { getHeaders(disease: $disease) { common { name description } disease { name description } } }",
   "variables": {
     "disease": "PSP"
   }
